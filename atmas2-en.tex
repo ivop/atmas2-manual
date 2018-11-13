@@ -1,0 +1,2040 @@
+\documentclass[10pt,a4paper,twoside,final,openright,titlepage]{memoir}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{enumerate}
+\usepackage{fancyvrb}
+\usepackage{keystroke}
+\usepackage{longtable}
+\usepackage{lscape}
+\usepackage{fix-cm}
+
+\pagestyle{plain}
+
+\usepackage{graphicx}
+
+\newcommand{\foo}[1]{\ensuremath{< \!\! #1 \!\! >}}
+\def\atmas{\texttt{AT\-MAS-II }}
+\newcommand{\key}[1]{\keystroke{\tiny #1}}
+
+\begin{document}
+
+\fontsize{2.5cm}{2.5cm}\selectfont
+\renewcommand{\arraystretch}{0.95}
+\begin{tabular}{!{\vrule width 4pt}ll}
+& \\
+& \\
+& {\ttfamily ATMAS-II} \\
+& \\
+& {\HUGE \textsc{Manual}} \\
+& \\
+& \textsc{\small draft, \today.} \\
+& \\
+\end{tabular}
+\normalsize
+
+\thispagestyle{empty}
+\newpage
+
+\chapter*{}
+\thispagestyle{empty}
+\begin{center}
+\atmas Manual \\
+\bigskip
+A Macro-assembler, editor and machine language monitor for the ATARI 400/600XL/800/800XL and ATARI 130XE with a diskdrive and at least
+48kB RAM \\
+\bigskip
+The \atmas program, disk and manual are copyright by \\
+\bigskip
+Ing. W. Hofacker GmbH and Dipl.-Ing. Peter Finzel \\
+\bigskip
+All rights reserved, 1985 \\
+\bigskip
+Scanned, OCR'd, typeset in \LaTeXe and translated from German to English \\
+by Ivo van Poorten, 2011
+\end{center}
+
+\newpage
+\thispagestyle{empty}
+\paragraph{LOAD INSTRUCTIONS}
+
+\begin{list}{\labelitemi}{\leftmargin=1em}
+\item Remove any cartridge from the cartridge slot of your ATARI Computer.
+\item Turn on the diskdrive and monitor.
+\item Once the red LED of the disk drive is off, insert the disc with
+the inscription at the top; the oval cut enters the drive first.
+Close the door of the diskdrive.
+\item Then turn your ATARI computer. On XL models you have to hold the \key{OPTION} key while swithing on the computer.
+\item \atmas is now loading. After a short time the opening credits appear and then the editor. The loading process is complete.
+\end{list}
+
+If the message '\texttt{\atmas benötigt 48K-Speicher}' (\atmas needs 48K Memory) appears, there are several options:
+
+\begin{enumerate}[a]
+\item There's still a cartridge in the cartridge slot.
+\item The \key{OPTION} key is not pressed (XL models only).
+\item Your computer does not have enough memory. \atmas needs at least 48kByte.
+\end{enumerate}
+
+\paragraph*{DEMO PROGRAM HOWTO} \hfill
+\bigskip
+
+If you want to view a short demo program of the \atmas system
+before you read the manual, you can achieve this by following
+the instructions below:
+
+\noindent\texttt{\\
+\key{ESC}RD:DEMO \key{ESC}\key{ESC} (Load the demo program) \\
+\key{CTRL--Y} (Assemble the program) \\
+\key{ESC} (Return to the editor) \\
+\key{ESC}U\key{ESC} (Start the program) \\
+\key{START} (Stop the program) \\
+}
+
+Note: \key{ESC} means you have to press the ESC-key.
+\key{CTRL--Y} means you have to hold the CTRL-key while you press the Y-key.
+
+\clearpage
+
+\chapterstyle{veelo}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\tableofcontents
+
+\chapter*{Introduction}
+
+\atmas is a powerful development system for assembly programs on your Atari computer.
+\atmas consists of three integrated subsystems: an editor, a macro assembler and a machine
+language monitor.
+These components together allow a convenient and fast low level assembly program development.
+
+All three parts of this programming environment  are tightly integrated and only
+a keystroke away from each other.
+A user-friendly, screen-based editor with features such as a copy register,
+repeatable command sequences and space-saving real tabs, facilitate the entry of
+large  programs.
+The macro assembler is able to achieve the shortest possible assembling time by using
+modern hashing algorithms such that longer programs are assembled in only a few seconds.
+Finally, there's a built-in monitor for testing programs.
+
+Although someone who has never programmed in assembly will quickly feel familiar with \atmas, it also
+offers many features for advanced users, such as the powerful editor functions and the macro
+programming commands.
+
+It should be noted that this manual is not a textbook for learning \texttt{6502}-machine language.
+I refer to other books on the subject, particularly to a book appearing in the fall of '85 by
+the author of this manual that is tailored specifically to the Atari computer.
+In addition, the examples in chapter 4 of this manual show a little  insight  into the assembly
+language  programming  of the Atari  computer.
+
+\chapter{The editor}
+
+The \atmas editor is a screen oriented editor that works without any line numbers.
+It essentially behaves like a word processor.
+This eliminates the tedious entry of LIST commands which is known from several other
+editors (e.g. in BASIC).
+You can easily move through the listing by using the cursor keys,
+which then scrolls from top to bottom or from bottom to top.
+
+\section{Using the editor}
+
+Once \atmas has been loaded from the floppy disk, you go directly into the editor,
+which is also sort of the Control Center of the \atmas system.
+From here you can call the macro assembler and the machine language monitor.
+The \key{RESET} key will always bring you back to the editor.
+
+After booting, you will see the following screen:
+
+\begin{Verbatim}[samepage=true]
+         +---------------------------+
+         I P:00000 T:17408 C:1O24 OK I <---Status bar
+         +---------------------------+
+Cursor ->I C                         I
+         I                           I
+         I       Textwindow          I
+         I                           I
+         I                           I
+         +---------------------------+
+         I ..........................I <---Command line
+         +---------------------------+
+\end{Verbatim}
+
+\subsection{The status bar}
+
+The status bar will continuously inform you about the cursor position, free memory, the copy register
+and the state of the editor.
+
+'\texttt {P:nnnnn}' tells you the distance (in characters) of the cursor from the beginning of the text
+to the current position,
+'\texttt {T:xxxxx}' provide you with information on free memory, (i.e. you can still enter
+'\texttt {xxxxx}' characters).
+'\texttt {C:yyyy}' offers information on the free space of the copy register (the so-called C-register) 
+which consists of 1024 characters when it is empty.
+The last two characters in the status bar display a status message from the editor.
+If everything is fine, you'll find '\texttt{OK}' displayed there.
+Any error or status messages (e.g. if the copy register is open) is shown here.
+A list of possible messages can be found in Appendix B.
+
+\subsection{Text window}
+
+The next 21 lines are the text window, where you always see the current text,
+which you can edit with the editing functions discussed in the following sections.
+In the truest sense of the word, this screen must be understood as a window into the text,
+which can be moved up and down over the text with e.g. the cursor keys.
+All editing is immediately visible in the text window.
+
+\subsection{Command line}
+
+The last line of the screen is reserved for entering commands.
+Besides a number of direct commands that are given directly in the text window,
+there is also another command mode of the editor, which is activated by pressing the \key{ESC} key.
+Here you enter commands that require additional information, such as a word to look for.
+Commands for loading and saving of text can be entered here, too.
+
+\section{Text input}
+
+You can immediately start entering text, without any line numbers.
+Each character is stored at the current cursor position and the cursor moves right one position.
+You can always start a new line by pressing \key{RETURN}.
+If you enter more than 38 characters in a row,
+the cursor disappears from the right side of the screen similar to pressing the \key{RETURN} key
+and appears at the beginning of the next line again.
+This behavior seems unusual at first glance, but you will soon find that in assembly language
+programs this is quite an advantage.
+The essential part of an assembler program is always in the first 30 characters,
+because the assembler instruction is there.
+When you want to edit long lines (e.g. comments), there is a special function available
+(\key{CTRL-V}, see section XXXXX on special features),
+giving you a maximum of 76 characters on two lines of the screen.
+You will notice, however, that the normal 38-character screen is much
+better for editing assembly programs, because all assembly instructions,
+contrary to the two-line mode, will not be interrupted by blank lines between them.
+
+As usual, all the keys have the auto-repeat function.
+Lower case can be achieved with the \key{CAPS} key.
+
+\section{Edit commands in text mode}
+
+As mentioned above, the \atmas editor offers two different levels of command input.
+The simpler of the two are the so-called direct commands, also called commands in text mode.
+These commands are executed either by special keys, for example \key{BACKSPACE},
+or control functions.
+The latter simply means that the \key{CTRL} key (For 600/8OOXL: \key{CONTROL}) has to be hold down
+while you press another key, similar to how you move the cursor in ATARI BASIC.
+If you read the following: \key{CTRL-X}, it means that you are holding down \key{CTRL}
+while pressing the \key{X} key.
+
+\subsection{Cursor movement}
+
+In text mode, you have the following cursor functions:
+\bigskip
+
+To move the cursor right, press
+\key{CTRL-$\rightarrow$}.
+
+A cursor movement to the left is done with \key{CTRL-$\leftarrow$}.
+When you get to the right end of a line, the cursor is moved to the beginning of the next line.
+Go beyond the left end, and the cursor is moved to the end of the previous line.
+
+To move the cursor up, press \key{CTRL-$\uparrow$}.
+The cursor is, if it is not already there, moved to the left margin.
+If that is this case, it is the second key press that moves one line up.
+
+The cursor can be moved to the line below to the beginning of the next line by
+pressing \key {CTRL-$\downarrow$}.
+With all cursor movements, you can not go beyond the beginning and end of the text.
+Unlike other editors, you will notice that the cursor is not on the text, but is inserted.
+This has the advantage that you always know exactly where the text will be inserted.
+
+\subsection{Deleting characters}
+
+To delete a character left of the cursor, press \key{BACKSPACE}.
+When the cursor is at the beginning of the line, the return character is deleted,
+i.e. the line where the cursor was is appended to the previous one.
+If this was a blank line and consisted solely of a return character, the blank line is deleted.
+
+To delete a character right of the cursor, press \key{CTRL-BACKSPACE}. Just like the above case, the next line can be appended to
+the current line. If this is a blank line, it is deleted.
+
+\subsection{Deleting lines}
+
+If you want to delete a line, you can press \key{CTRL-X}.
+All characters from the current cursor position till the end of the line will be deleted.
+If the cursor is at the beginning of a line, the whole line will be deleted.
+
+\subsection{Cursor jumps}
+
+\key{CTRL-E} brings you to the beginning of the text. \\
+\key{CTRL-D} brings you to the end of the text.
+
+\subsection{Tabulator}
+
+The ATMAS-Editor has a real Tabulator that moves the cursor
+between 1 and 9 spaces, but internally only occupies 1 character.
+To reach the next tabulated point, simply press \key{TAB}.
+
+If you later move your cursor around a tab location, you
+will notice that the cursor jumps and inserts before a tab
+do not move the text after it. The tab is stored as a single
+character, hence you can use it to create readable listings
+without wasting memory space.
+
+\subsection{Copy-Register (C-Register)}
+
+The C-Register is a secondary text buffer which has a size of
+1024 characters. You can use it to move or copy parts of your
+text. First, position the cursor at the end of the block you
+want to transfer and open the C-Register by pressing \key{CTRL-R}.
+
+At the left of the status bar, this mode is denoted with 
+'\texttt{CR}'. If you move the cursor backwards, the text you
+walk-over will be copied to the C-Register buffer. You can follow
+its progress. The number of free characters in the C-Register
+('\texttt{C:1O24}')decreases with every cursor movement.
+
+When you're finished, you can close the C-Register by pressing \key{CTRL-F}.
+
+Now you can paste the contents of the Copy-Register wherever you want
+by pressing \key{CTRL-J}. The contents of the Copy-Register are
+preserved, so you can make multiple copies of the same text.
+To clear the Copy-Register, press \key{CTRL-K}. The C-Register is also
+cleared if you run the assembler or any I/O takes place.
+
+Moving, instead of copying,  a block of text can be done by
+filling the C-Register buffer using \key{BACKSPACE} or \key{CTRL-X}
+instead of \key{CTRL-$\uparrow$} or \key{CTRL-$\leftarrow$}.
+The deleted text now resides in the C-Register an can be
+inserted at another location.
+
+You can also combine several pieces of text by reopening and closing the
+C-Register without clearing it in between with \key{CTRL-K}.
+
+When the C-Register is full ('\texttt{C:0000}'), the error message
+'\texttt{C?}' will appear at the left side.
+
+\subsection{Special commands for the editor}
+
+You can switch to two-line mode by pressing \key{CTRL-V}.
+In this mode, lines that are longer than 38 characters are
+displayed on two lines. The maximum line length is increased
+to 76 character, but the number of lines displayed is decreased
+to 11. Pressing \key{CTRL-V} again brings you back to single-line
+mode.
+
+Control characters, especially tabs and end-of-line characters,
+can be made visible by pressing \key{CTRL-T}. All control characters
+are shown in inverse video. Pressing \key{CTRL-T} again brings back
+the normal mode.
+
+\key{CTRL-G} repeats the command present on the command line. See
+section 1.4 for more information.
+
+\subsection{Calling the assembler and the monitor}
+
+The \atmas macro assembler is called by pressing \key{CTRL-Y}.
+Immediately, \atmas begins assembling the source code that
+resides in the text buffer. When it is finished, you can return
+to the editor by pressing a key.
+
+The machine code monitor can be called by pressing \key{CTRL-P}.
+'\texttt{MONITOR.}' is shown and it awaits your input (see section 3).
+Returning to the editor can be accomplished by inputting '\texttt{E}'.
+
+\section{Commands on the command line}
+
+In addition to the direct commands in text mode,
+the \atmas editor has another powerful editing mode!
+The command line. You will find primarily commands here
+that need more information than the actual call of the command,
+such as a character string to be searched for.
+You will also find some commands that you know from the text mode here,
+but these can be provided with repetition factors and chained.
+A sort of 'command macros'.
+
+\subsection{Using the command line}
+
+You enter the command mode by pressing the \key{ESC} key,
+which is represented as a dollar sign. Now you can enter
+individual commands while using the \key{ESC} key as a delimiter.
+The command line is executed when you press \key{ESC} twice.
+The execution is acknowledged with a double cross behind the chain
+of commands, you then move back to text mode. If the command line has
+proven to be faulty, you will be told so in the upper left corner by
+an error symbol.
+
+All commands (except the I/O commands \texttt{R} and \texttt{W}) can be
+performed repeatedly by preceding it with a repetition factor between 2 and 255.
+In addition, a single repetition of a complete command line can be done
+by pressing \key{CTRL-G} from the text mode.
+
+Errors in the command line itself can be corrected with \key{BACKSPACE}.
+\key{CTRL-X} will delete the command line and return to text mode.
+
+\subsection{Edit functions on the command line}
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\texttt{B} & Cursor one position backwards \\
+\texttt{F} & Cursor one position forwards \\
+\texttt{D} & delete one character left from the cursor \\
+\texttt{T} & delete from cursor position until the end of the line \\
+\end{tabular}
+\\
+\par
+With these commands, for example, rapid cursor movement in the text is possible.
+Open the command line with \key{ESC} and type '\texttt{200F}' followed by pressing \key{ESC} twice.
+Each repetition of the command line with \key{CTRL-G} will bring you 200 characters further in the text buffer.
+
+\subsection{More editing commands}
+
+\renewcommand{\arraystretch}{1.8}
+\begin{tabular}{lp{25em}}
+\texttt{H}\foo{HexByte} & Insert any ATASCII-code in the text,
+		e.g. for printer control.
+		EXAMPLE: \texttt{\$H0F\$} switches an EPSON printer
+			  to condensed \\
+
+\texttt{S}\foo{String} & 	Search string from current position
+		to the end of the text. If it's not found, '\texttt{S?}'
+		will appear in the status bar.
+		EXAMPLE: \texttt{\$SLABEL\$} searches for LABEL. \\
+
+\texttt{!}\foo{String} & 	Inserts string \foo{String} at the current cursor position.
+	Can be used as a search and replace function (see below) in conjunction with the S command.
+	
+\end{tabular}
+
+\subsection{Special functions}
+
+\begin{tabular}{lp{25em}}
+\texttt{J} & 		Repeat the complete command line.
+		Can, for example, be used for global search
+		and replace. \\
+
+\texttt{K} & 		Clears the entire text buffer.
+		CAUTION: All entered text will be deleted! \\
+
+\texttt{U} & 		USER Command. Call a machine code program
+		located at \texttt{\$A800} with the JSR instruction.
+		CAUTION: be sure there's an actual program at that
+		location. \\
+
+\texttt{@}\foo{n} & 		Set the tab-width to \foo{n} characters.
+		If none is specified, it is set to 8.
+		EXAMPLE: \texttt{\$@6\$} : set tab-width to 6 characters. \\
+
+\texttt{M} & 		Return to DOS. You can return to \atmas with '\texttt{B - * \atmas *}'
+		from the DOS menu. \\
+\end{tabular}
+
+Two more commands that affect the C register:
+
+\begin{tabular}{lp{25em}}
+\texttt{E} & Clear the C-Register (like \key{CTRL-K}) \\
+\texttt{G} & Insert C-Register contents in the text (like \key{CTRL-J}) \\
+\end{tabular}
+
+\subsection{Commands for in-/output of text}
+
+If you want to save a text present in the text buffer to disk, you can
+do this with the '\texttt{W}'-command. You only need to specify the desired
+name of the file preceded by a device name.
+
+EXAMPLE: If you want to safe the text as \texttt{TEST.SRC} on drive 1,
+you enter:
+
+\par
+\bigskip
+\key{ESC}\texttt{WD1:TEST}\key{ESC}\key{ESC}
+\par
+\bigskip
+
+The extension \texttt{.SRC} is appended automatically.
+You can also specify a different extension manually, like
+\texttt{\$WD1:TEST.ATM\$} \key{ESC}
+
+CAUTION: The text will be saved starting at the
+	\emph{current cursor position}. Hence, if you want to save
+	the full text, you need to press \key{CTRL-E} first.
+
+In a similar way, you can load a text file from disk to memory.
+For this, the command '\texttt{R}' is used, which is used like '\texttt{W}'.
+
+EXAMPLE: To load the demo file \texttt{DEMO.SRC} of the \atmas diskette
+(in drive 1):
+
+\par
+\bigskip
+\key{ESC}\texttt{RD1:DEMO}\key{ESC}\key{ESC}
+\par
+\bigskip
+
+The extension \texttt{.SRC} will again be appended automatically.
+The file is then loaded starting at the current cursor position.
+This gives two possibilities:
+
+\begin{enumerate}
+\item When a new file is to be loaded, then delete the previous 
+text buffer in advance with \key{ESC}\texttt{K}\key{ESC}\key{ESC}.
+
+\item You can also insert individual files in the text buffer
+(similar to the copy register) by bringing the cursor to the desired position
+and then execute the load command.
+\end{enumerate}
+
+If an error occurs during an I/O command, this is displayed in the status line
+with the text '\texttt{RW}'.
+
+\subsection{Listings}
+
+Printouts of the source code can be made with the '\texttt{L}' command.
+There are several options:
+
+\begin{tabular}{lp{25em}}
+\texttt{L}  & 	Listing scrolls across the screen \\
+\texttt{L0} & 	Output to RS232 Interface \# 1 of the 850 interface modules (\texttt{R1:}) \\
+\texttt{L1} & 	Output is via the normal Printer-handler '\texttt{P:}', that is usually on the Atari 850 interface module, too.\\
+\texttt{L7} & 	Listing is output via the Centronics interface on the joystick ports 3 and 4.
+				This option is available only for the Atari 400/800 computer. \\
+\end{tabular}
+
+\subsection{Notes on advanced editor use}
+
+The possibility of command chaining at the command line allows very convenient editing features:
+
+\par
+\bigskip
+	\texttt{\$SLDA\$3D\$ILDX\$J\$}\key{ESC}
+\par
+\bigskip
+
+This chain of commands will exchange all LDA commands from the cursor position to LDX commands. How does it work?
+First, an LDA instruction is sought (\texttt{\$SLDA}). After that, the cursor can then be thought to be positioned behind the string searched for.
+'\texttt{\$3D}' now deletes three characters to the left of the cursor (remember the
+repetition factor!), while '\texttt{\$ILDX}' inserts the string '\texttt{LDX}'.
+
+'\ texttt {\$J}' in turn causes the entire command line to be executed until the text is finished, or a '\texttt{S?}'
+error (String not found) occurs.
+
+\chapter{The macro assembler}
+
+\section{Using the macro assembler}
+
+From within the editor the \atmas macro assembler is invoked with \key{CTRL-Y}.
+It then immediately begins assembling the source code, which must reside in the text buffer of the editor.
+
+The assembly is divided into three passes. The second pass indicates its activity by a rapidly changing
+character in the upper left corner of the screen.
+The third pass is a listing of the assembled program on the printer or the screen output (see OUT-directive).
+
+
+The process of assembling is continued until either the source is over,
+a Ctrl-Z character is detected (assembler stop character) or an error has been detected.
+In the latter case, an error message (see Appendix B) is displayed on the screen.
+Any key will take you back to the editor, exactly at the place that caused the error.
+You can immediately improve the error and restart the assembler with \key{CTRL-Y}.
+
+This comfortable 'hand-in-hand' work between editor and assembler is a key point that makes \atmas
+so powerful as a development system for machine language programs, and yet it makes the operation easy.
+
+\section{Input format of the assembler}
+
+The \atmas macro assembler knows all the opcodes of the 6502 CPU as far as they are described in the
+'\textit{MOS Technology 6502 Programming Guide}'. Similarly, the notation of the addressing modes follows
+what is proposed in that book (see below).
+
+A line of code can have the following formats:
+
+\begin{enumerate}[a)]
+\item Blank line: Consists only of a \key{RETURN} character.
+
+\item Comment line: Starts with a '\ texttt {*}' in the first column. 
+
+Example:
+\begin{Verbatim}
+* Copyright (c) M. Huber
+\end{Verbatim}
+
+\item Command line with label: Starts with a label followed by a delimiter (space or tab),
+then a \texttt{6502} opcode or assembler directive, and finally, after a further delimiter,
+it can be followed by a comment. \\
+
+Example:
+\begin{Verbatim}[samepage=true]
+LOOP    LDA #$10
+DOSVEC  EQU $000C	DOS-VECTOR
+\end{Verbatim}
+
+\item Command Line: Must always start with a delimiter. To get clean Listings it is recommended
+to have these begin with a tab. This is followed by a \texttt {6502} opcode or assembler directive.
+As in the previous case, a comment can be here after another delimiter.
+
+Example:
+\begin{Verbatim}[samepage=true]
+        STA COLOR0 	CHANGE COLOR
+        DFB 100,120,140
+\end{Verbatim}
+\end{enumerate}
+
+\subsection{Addressing modes}
+
+Im folgenden eine kurze Zusammeniassung der Schreibweisen der einzelnen Adresslerungsarten, jeweils mit
+einem Beispiel versehen:
+\bigskip
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{llp{20em}}
+Implied Akku			& \foo{Opcode}										& \texttt{ASL} \\
+Immediate 				& \foo{Opcode} \texttt{\#} \foo{Ausdruck}				& \texttt{LDA \#\$FF} \\
+Absolut, Zeropage 		& \foo{Opcode} \foo{Ausdruck} 							& \texttt{STA \$600} \\
+Relativ 				& \foo{Opcode} \foo{Ausdruck} 							& \texttt{BNE *+4} \\
+Absolut X-indiziert 	& \foo{Opcode} \foo{Ausdruck}\texttt{,X} 				& \texttt{CMP \$3000,X} \\
+Absolut Y-indiziert 	& \foo{Opcode} \foo{Ausdruck}\texttt{,Y} 				& \texttt{LDA TABLE,Y} \\
+lndirekt-indiziert 		& \foo{Opcode} \texttt{(}\foo{Ausdruck}\texttt{),Y}		& \texttt{EOR (\$F0),Y} \\
+Indiziert-indirekt 		& \foo{Opcode} \texttt{(}\foo{Ausdruck}\texttt{,X)} 	& \texttt{STA (\$F0,X)} \\
+\end{tabular}
+
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+Wie schon erwähnt, ist vor jedem \foo{Opcode} ein Label
+möglich, nach jedem Assemblerbefehl kann ein Kommentar
+stehen, der mit einem Trennzeichen abgesetzt ist.
+
+AUSNAHME: Nach implied-Akku Befehlen muß das Kommentarfeld durch einen Strichpunkt abgetrennt sein.
+
+\subsection{Labels}
+
+Labels oestehen aus Buchstaben und Zahlen, wobei das
+erste Zeichen immer ein Buchstabe sein muß. Die
+maximale Länge beträgt 8 Zeichen, wobei alle Zeichen
+signifikant sind.
+\bigskip
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{8em}p{16em}}
+Gültige Labels				& Ungültige Labels \\
+\hline
+\texttt{SCHLEIF} 			& \texttt{1LOOP} \\
+\texttt{SCHLEIF1}			& \texttt{SCHLEIFEN} (9 Buchstaben!) \\
+\texttt{S12345}				& \\
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+
+\subsection{Konstante}
+
+\atmas kennt vier Arten von Konstanten: Dezimal-,
+Hexadezimal-, Binär- und Zeichen-Konstante.
+
+\begin{enumerate}[a)]
+
+\item Dezimale Konstante
+
+Bestehen einfach aus der Zahl selbst (im Bereich \texttt{0} bis
+\texttt{65535}).
+
+	Beispiele: \texttt{10}, \texttt{100}, \texttt{3000}, \texttt{65535}
+
+\item Hexadezimale Konstante
+
+Bestehen aus einem Dollar-Zeichen ('\texttt{\$}') und gültigen
+Hexadezimalziffern (\texttt{O}-\texttt{9},\texttt{A}-\texttt{F}).
+
+	Beispiele: \texttt{\$10}, \texttt{\$FF}, \texttt{\$AB00}, \texttt{\$FFFF}
+
+\item Binare Konstante
+
+Bestehen aus einem Prozent-Symbol mit nachfolgenden
+gültigen Bi\-när\-zif\-fern (\texttt{0},\texttt{1}).
+
+	Beispiele: \texttt{\%1}, \texttt{\%1001}, \texttt{\%11110000}
+
+\item Zeichen-Konstante
+
+Werden aus einem Apostroph mit nachfolgenden \texttt{ASCII}
+(bzw. \texttt{ATASCII})-Zeichen gebildet. Die Zeichen werden in
+7-Bit-Werte umgewandelt (Bit 7 immer Null).
+
+	Beispiele: \texttt{'X}, \texttt{'\#}, \texttt{'e}, \texttt{'"}
+\end{enumerate}
+
+\subsection{Negative Konstante}
+
+Alle Vonstanten können durch ein vorangestelltes
+Minus-Zeichen als negative Zahlen interpretiert
+werden. Die Darstellung erfolgt im Zweierkomplement
+(\texttt{-1}=\texttt{\$FFFF}).
+
+	Beispiele: \texttt{-1}, \texttt{-\$100}, \texttt{-\%101101}, \texttt{-'B'}
+
+\subsection{Interner Adresszähler}
+
+\atmas führt während der Assemblierung einen
+internen Adresszähler mit, der jeweils auf den Upcode.
+der gerade übersetzten Anweisung zeigt (bzw. auf das
+nächste freie Byte nach dem zuletzt berechneten
+Ausdruck in DFB/DFW Direktiven). Dieser interne
+Adresszähler kann jederzeit durch das '\texttt{*}'-Symbol
+abgerufen werden. Dies kann in vielfältigen Weisen
+benutzt werden:
+
+\begin{enumerate}[a]
+\item Speicherplatz reservieren:
+	\texttt{ORG *+\$100} reserviert 256 Bytes
+\item relative Sprünge ohne Label:
+	\texttt{BNE *+4} überspringt die nächsten 4 Bytes
+\item Adressversetzte Labels für Software-Stackinq
+	\texttt{RETADR EQU *-1} momentane Adresse minus 1
+\end{enumerate}
+
+\subsection{Ausdruck}
+
+Ein Ausdruck kann eine Konstante, ein Label, ein
+Makroparameter (siehe 2.4), der momentane Adress-Zähler ('\texttt{*}') oder eine arithmetische Verknüpfung
+derselben sein. Zugelassene Verknüpfungen sind: \texttt{+}, \texttt{-},
+\texttt{*}, \texttt{/}, der Rechenbereich beträgt O-65535. Einige
+Beispiele dazu:
+
+\begin{Verbatim}[samepage=true]
+	LDA #$FF        Konstante
+	LDA #LABEL1     Label
+	STA LABEL+$A0   Verknüpfung
+	LDA *+$10       momentaner Adr.-Zähler+0ffset
+\end{Verbatim}
+
+Zusätzlich sind auch Klammern zur Klärung der Priori-
+tät möglich:
+
+\begin{Verbatim}[samepage=true]
+	LDA #($A0+5)/1O
+	LDA #LAB1-(Lab1/256)*256
+\end{Verbatim}
+
+\section{Assembler-Direktiven}
+
+\subsection{\texttt{ORG}}
+
+\newcommand{\directive}[3]{
+\begin{tabular}{lp{25em}}
+Zweck:		& #1 \\
+Syntax:		& #2 \\
+Beispiel:	& #3 \\
+\end{tabular}
+\bigskip
+}
+
+\directive{bestimmt den Inhalt des assemblerinternen Adress-Zählers.}
+		  {[\foo{label}] \texttt{ORG} \foo{AL}[,\foo{AP}] [\foo{kom}]}
+		  {\texttt{ORG \$A800}}
+
+\texttt{ORG} bestimmt die Anfangsadresse des Dbjektprogrammes,
+im obigen Beispiel ist der für diese Zwecke reser-
+vierte Speicherbereich ab \texttt{\$AB00} gewählt.
+ln manchen Fällen ist es aber nicht möglich, das
+Objekiprogramm direkt in den gewünschten Speicher-
+bereich zu legen, wenn dieser 2.8. von \atmas belegt
+wird (s. Memory-Map im Anhang!). Hierzu können Sie
+den zweiten Parameter der \texttt{ORG}-Direktive verwenden, die
+sogenannte 'physikalische Adresse' \foo{AP}.
+
+\begin{Verbatim}
+	ORG $3000,$A800
+\end{Verbatim}
+
+Dieser \texttt{ORG}-Befehl würde ein Programm so assemblieren,
+daß es an der Adresse \texttt{\$3000} (logische Adresse, \foo{AL})
+lauffähig ist, während der Assemblierung aber im
+freien Speicherbereich ab der Adresse \texttt{\$A800} abgelegt
+wird. Damit das Programm ausgeführt werden kann, muß
+es an die richtige Stelle verschoben werden, das kann
+2.8. mit dem SAVE-Befehl des Monitors geschehen, der
+ein Binärfile so abspeichern kann, daß es beim erneu-
+ten Einlesen an den richtigen Speicherplatz kommt. In
+einfacheren Fällen (2.8. wenn das Programm in dem
+Adressbereich abgelegt werden soll, in dem \atmas
+seine Symboltabelle hat) hilft auch der
+Blocktransfer-Befehl des Monitors.
+
+\subsection{\texttt{EQU}, \texttt{EPZ} (Equates)}
+
+\directive{Zuordnung eines Wertes zu einem Label.}
+		  {\foo{label} \texttt{EQU} \foo{ausdruck} [\foo{kom}] \par
+		   \foo{label} \texttt{EPZ} \foo{ausdruck} [\foo{kom}]}
+		  {
+\texttt{GRUEN 	EQU \$A0 } \par
+\texttt{CIOV 	EQU \$E456 } \par
+\texttt{SAVHSC 	EPZ \$58 } \par
+\texttt{PLAYER 	EQU PHBASE+1024 }
+}
+
+Die \texttt{EQU}-Direktive wird benutzt, um einen Label mit
+einem bestimmten Wert zu definieren, es kann sich
+dabei sowohl um ein Datum oder eine Adresse handeln.
+Der erste Label des Beispieles wird z.B. sicher als
+Datum für einen immediate-Befehl verwendet werden (\texttt{LDA \#GRUEN}), während das
+zweite Beispiel eine ROM-Ein-sprungadresse bezeichent (JSR CIOV).
+
+\texttt{EPZ} (Equate Page Zero) hat prinzipiell die gleiche
+Funktion, kann aber verwendet werden, wenn zum
+Ausdruck gebracht werden soll, daß der Label einen
+Zeropage-Speicherplatz darstellt. Es besteht aber
+kein Zwang zur Verwendung von \texttt{EPZ}, da \atmas
+Zeropage-Adresslerungsarten selbsttätig erkennt. \texttt{EPZ}
+dient hierbei nur der Verdeutlichung, Sie können in
+allen Fällen auch \texttt{EQU} verwenden.
+
+\subsection{\texttt{DFB} (Define Byte)}
+
+\directive{definiert den Inhalt einzelner Bytes im Objectcode}
+		  {[\foo{label}] \texttt{DFB} ]foo{ausdruck}[,\foo{ausdruck}][ \foo{kom}]}
+		  {
+\texttt{TABELL 	DFB 1,2,4,8,16,32,64,128} \par
+\texttt{DFB 'A, 'B, 'C} \par
+\texttt{DFB 'X+128}
+}
+
+Die nach \texttt{DFB} folgenden Ausdrücke werden als 8-Bit
+werte in den Objektcode abgelegt. Die erste Zeile des
+Beispieles würde folgende Sequenz erzeugen:
+
+\begin{Verbatim}
+	01 02 04 08 10 20 40 80
+\end{Verbatim}
+
+\texttt{ATASCII} werte werden als 7-Bit Nerte abgelegt, das
+höchstwertiqe Bit ist immer Null.
+
+\subsection{\texttt{DFW} (Define Word)}
+
+\directive{definiert den Inhalt eines 16-Bit Wortes im Objektcode.}
+		  {[\foo{label}] \texttt{DFW} \foo{ausdruck}[,\foo{ausdruck}...][ \foo{kom}]}
+		  {
+\texttt{ADRTAB 	DFW \$A900,\$AA03,\$AB06} \par
+\texttt{DFW ADRTAB-1,ADRTAB+2}
+}
+
+Die nach \texttt{DFW} foldenden Ausdrücke werden als 16-Bit
+Werte im Objektcode abgelegt. Dabei wird die Reihen-
+folge der \texttt{6502}-Adressen benutzt, d.h. zuerst das
+niederwertige (LSB), dann das höherwertige Byte (MSB).
+Die erste Zeile des Beispiels würde demnach folgendes
+erzeugen:
+
+\begin{Verbatim}
+	00 A9 03 AA 06 AB
+\end{Verbatim}
+
+\subsection{\texttt{ASC} (ASCII-String)}
+
+\directive{fügt einen String in ATASCII- oder Bildschirmcodierung in den Objektcode ein.}
+		  {[\foo{label}] \texttt{ASC} \foo{STZ}\foo{string}\foo{STZ}[,\foo{STZ}\foo{string}\foo{STZ}][ \foo{kom}]}
+		{
+\texttt{TEXT 	ASC "HALLO"} \par
+\texttt{MELD 	ASC /DISK-FEHLER/} \par
+\texttt{ASC /MAKRO/,\char`\\{ASSEMBLER}\char`\\} \par
+\texttt{ASC Z Normaler Bildschirmcode Z} \par
+\texttt{ASC S Inverser Bildschirmcode S} \par
+}
+
+Strings nach einer \texttt{ASC}-Direktive werden Byte für Byte
+in den Objektcode übertragen. Abhängig vom Trennzeichen (\foo{STZ}) können verschiedene Funktionen
+angewählt werden:
+
+\begin{tabular}{lp{25em}}
+\texttt{"} 			& Text im \texttt{ATASCII}-Code eintragen \\
+\texttt{/} 			& \texttt{ATASCII}-Code, aber Bit 7=1 (Invers) \\
+\texttt{\char`\\} 	& \texttt{ATASCII}-Code, beim letzten Zeichen wird Bit 7 gesetzt (Ende-Kennung) \\
+\texttt{\%}			& interner Bildschirmcode wird generiert \\
+\texttt{\$}			& Bildschirmcode mit Bit 7=1 (Invers)
+\end{tabular}
+\bigskip
+
+Jeder String muß von zwei gültigen String-Trennzeichen
+umschlossen werden. Anfangs- und Endtrennzeichen
+müssen gleich sein.
+
+Statt dem Anführungszeichen \texttt{"} ($\!\!$\key{SHIFT-2}$\!\!$) können Sie
+auch ein beliebiges anderes nicht alphanumerisches Zeichen
+benutzen, die oben genannten natürlich ausgeschlossen. Denkbar wären hier z. B. \texttt{!}, \texttt{\#}, oder \texttt{\&}, Bedingung
+ist lediglich, daß der String mit dem gleichen
+Trennzeichen abgeschlossen wird. Mit diesem Trick ist
+es möglich, daß Sie ein Anführungszeichen in den Text
+bekommen.
+
+In Verbindung mit dem Displaylistkonzept der Atari-
+Computer gestattet Ihnen der \texttt{ASC}-Befehl die komfortable Programmierung von Titeln und Uberschriften, da
+direkter Bildschirmcode erzeugt werden kann. Das Beispielprogramm \texttt{ASCDEMO.SRC} auf der \atmas Diskette
+zeigt Ihnen, wie's gemacht wird.
+
+\subsection{\texttt{OUT} (Output Listing)}
+
+\directive{Ausgabe eines Assembler-Listings}
+		  {[\foo{label}] \texttt{OUT} [\texttt{L}][\texttt{N}][\texttt{M}][\texttt{P0}][\texttt{P1}][\texttt{P2}][ \foo{kom}]}
+		  {
+\texttt{OUT L} \par
+\texttt{OUT LP1} \par
+\texttt{OUT LNMP1} \par
+}
+
+Mit \texttt{OUT} können Sie bestimmen, ob Sie ein Protokoll des
+Assembliervorganges haben möchten und das zugehörige
+Ausgabegerät festlegen. Folgende Parameter werden
+erkannt:
+\bigskip
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lp{25em}}
+\texttt{L}	& Listing wird erzeugt \\
+\texttt{N}	& Symboltabelle wird ausgegeben \\
+\texttt{M}	& Makros werden NICHT expandiert (ausgedruckt!) \\
+\texttt{PO}	& RS232 Schnittstelle \\
+\texttt{P1}	& Atari-Drucker, Centonics-Schnittstelle (850) \\
+\texttt{P2}	& Joystick-Interface Port 3 und 4 (nur 400/800)
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+Nach jeweils 66 Zeilen wird ein Seitenvorschub
+generiert.
+
+\section{Mahrofähigkeit}
+
+\atmas gestattet Ihnen die Verwendung von Makrobefehlen. Darunter versteht man eine Folge von
+Assemblerbefehlen, denen im Rahmen einer Makrodefinition ein Name zugeordnet wurde. Bei der Verwendung
+dieses Makro-Namens im Quelltext werden die gesamten,
+ihm zugeordneten Assemblerbefehle erzeugt, man sagt,
+der Makro-Befehl wird expandiert. Mit Hilfe von Makros
+können Sie sich eine Art von zusätzlichen Assemblerbe-
+fehlen schaffen, die in Wirklichkeit aus einer Sequenz
+von einzelnen Maschinenbefehlen bestehen.
+
+\subsection{Makro-Definition}
+
+Bevor Sie ein Makro verwenden können, müssen Sie es
+zuerst definieren. Zu diesem Zweck dienen die zwei
+Assembler-Direktiven \texttt{MACRO} und \texttt{MEND}.
+
+Zum besseren Verständnis zuerst ein Beispiel, das den
+Basic-Befehl POKE imitiert:
+
+\begin{Verbatim}[samepage=true]
+POKE    MACRO ADRESS,DATA
+	LDA #DATA
+	STA ADRESS
+	MEND
+\end{Verbatim}
+
+Die Definition wird von der \texttt{MACRO}-Direktive mit
+voranstehendem Namen des Makros (hier: \texttt{POKE}) eingeleitet. Dieser Name wird später zum Aufruf verwendet.
+Nach der \texttt{MACRO}-Direktive folgen die sogenannten
+formalen Parameter, das sind keine Labels im eigentlichen Sinn, sondern nur Platzhalter für die beim
+Aufruf angegebenen tatsächlich einzusetzenden
+Parameter. Dieser Vorgang der Parametersubstitution
+wird bei der Besprechung des Makro-Aufrufes noch
+genauer erläutert.
+
+Jetzt folgen die Assemblerbefehle, die als Operanten
+sowohl gewöhnliche Labels als auch die in der
+\texttt{MACRO}-Direktive angegebenen formalen Parameter
+benutzen können. Abgeschlossen wird die Makro-Definition durch die \texttt{MEND} (Makro-Ende)-Direktive
+
+\begin{tabular}{lp{25em}}
+Syntax: & \foo{Makroname} \texttt{MACRO} [\foo{param}][,\foo{param}\dots] \par
+		  \dots \par 
+		  \texttt{MEND}
+\end{tabular}
+
+\subsection{Makroaufruf, Makroexpansion}
+
+Das in 2.4.1 definierte Makro kann im Quelltext mit
+
+\begin{Verbatim}
+	POKE 752,1
+\end{Verbatim}
+
+aufgerufen werden. Bei der Assemblierung findet dann
+folgendes statt: \atmas erkennt, daß es sich bei
+\texttt{POKE} um ein bereits definiertes Makro handelt und fügt
+die Maschinenbefehle der Definition in den Objektcode
+ein. Dabei werden die formalen Parameter der Definition mit den tatsächlichen Werten des Aufrufes
+ersetzt. Im Beispiel wird folglich \texttt{ADRESS} durch \texttt{752}, und
+\texttt{DATA} durch \texttt{1} ersetzt. Nach der Makroexpansion ergibt
+sich folgendes Maschinenprogramm:
+
+\begin{Verbatim}
+	LDA #1
+	STA 752
+\end{Verbatim}
+
+Die allgemeine Syntax für den Makroaufruf lautet:
+
+\begin{tabular}{lp{25em}}
+ & [\foo{label}] \foo{Makroname} [\foo{param}][,\foo{PAR}\dots]
+\end{tabular}
+\smallskip
+
+Es müssen ebensoviele Parameter (\foo{param}) übergeben
+werden, wie formale Parameter in der Definition
+angegeben wurden. Als Parameter können Konstante,
+Ausdrücke und auch Strings verwendet werden. Ein
+Beispiel zur Verwendung von Strings als Parameter
+finden Sie im Teil 4.2 (Makro-Biblio\-theken).
+
+\subsection{Lokale Labels}
+
+Als nächstes Beispiel betrachten Sie bitte das Listing
+des unten angegebenen Makros. Es handelt sich dabei
+um ein Programm zum Löschen eines Speicherbereiches
+von max. 256 Bytes (einer Page). Da das Programm mit
+einer Schleife arbeitet, enthält es folgerichtig auch
+einen Label. Hürden Sie dieses Makro zweimal innerhalb
+eines Programmes aufrufen, so wäre das Label \texttt{LOOP}
+doppelt verwendet, wodurch der Assembler den Fehler
+'\texttt{SAME LABEL TWICE}' meldet.
+
+\begin{Verbatim}[samepage=true]
+LOESCH  MACRO ADRESS,LAENGE
+	LDY #LANGE
+	LDX #0 
+	LDA #0
+LOOP    STA ADRESS,X
+	INX
+	DEY
+	BNE LOOP
+	MEND
+\end{Verbatim}
+
+Auch hier bietet Ihnen \atmas Unterstützung an: Ein
+Label, das mit dem '\texttt{@}' Symbol ($\!$\key{SHIFT-8}$\!$) endet,
+wird als lokales Label des Makros angesehen. Im
+Beispiel: statt \texttt{LOOP} muß der Label \texttt{LOOP@} verwendet
+werden (auch im \texttt{BNE}-Befehl!). Intern ersetzt \atmas
+das '\texttt{@}' Symbol durch eine vierstellige Zahl, die
+bei jedem Makroaufruf um eins erhöht wird. Dadurch
+erzeugt auch zweimalige Aufruf von \texttt{LOESCH} verschiedene
+Labels (nämlich \texttt{LOOP0001} und \texttt{LOOP0002}).
+
+\subsection{Verschachtelte Makros}
+
+Eine Makrodefinition selbst kann wiederum einen Makro-
+aufruf einschließlich der Übergabe von Parametern
+enthalten. Als Beispiel kann ein Double-Poke Befehl
+dienen, der das bereits besprochene \texttt{POKE}-Makro benutzt:
+
+\begin{Verbatim}[samepage=true]
+DPOKE   MACRO ADRESS,WORT
+	POKE ADRESS,WORT
+	POKE ADRESS+1,WORT/256
+	MEND
+\end{Verbatim}
+
+Diese Verschachtelungstechnik ist nur durch den Hardwarestack begrenzt.
+
+\subsection{Makros contra Unterprogramme}
+
+Sicherlich ist Ihnen bei der Beschreibung der Makros
+die nahe Verwandtschaft zu Unterprogrammen aufgefallen.
+Es gibt jedoch eine Reihe von wichtigen Unterschieden,
+die Sie sich verdeutlichen sollten:
+
+Makros sind universeller in der Benutzung, da Sie über
+den Mechanismus der Parameterübergabe verfügen. Sie
+eignen sich daher gut zum Aufbau von Makro- (Programm)
+Bibliotheken. Solche Makrosammlungen lassen sich
+leicht mit dem flexiblen \atmas Editor in den
+Quelltext einbinden. Makros gestatten wesentlich
+übersichtlichere Assemblerprogramme, man darf allerdings nicht übersehen, daß alle in der Definition des
+Makros angegebenen Maschinenbefehle bei jedem Aufruf
+des Makros in das Programm eingesetzt werden. Das ·
+bedeutet, wenn Sie das \texttt{LOESCH}-Makro fünfmal im Programm verwenden, daß es ebenso oft in Ihr Programm
+eingesetzt wird, und natürlich auch dementsprechend
+Speicherplatz verbraucht.
+
+Die Verwendung von Unterprogrammen ist wesentlich
+optimaler in Bezug auf Speicherplatz, wobei es allerdings schwieriger ist, die übergabe der Parameter so
+elegant wie im Makro zu gestalten. Ein weiterer, in
+manchen Fällen entscheidender Gesichtspunkt ist die
+Geschwindigkeit: Während Makros hier die bessere
+Lösung darstellen, dauert es bei Unterprogrammen etwas
+länger, da \texttt{JSR} und \texttt{RTS}-Befehle auch Zeit benötigen.
+
+\chapter{Der Maschinensprache-Monitor}
+
+Vom Editor gelangen Sie durch die Eingabe von \key{CTRL-P}
+in den Maschinen\-sprache-Monitor. Der Bildschirm wird
+gelöscht und das ''\texttt{MONITOR.}''-Prompt erscheint in der
+linkem oberen Bildschirmecke. Mit dem \atmas Monitor
+können Sie Maschinenprogramme starten, auf Diskette
+ablegen, den Speicherinhalt prüfen, verändern und
+disassemblieren und dabei ein Protokoll am Drucker
+mitführen. Da der Monitor über eine dialogorientierte
+Eingabe verfügt, brauchen Sie sich keinerlei komplizierte Befehlssyntax merken.
+
+\section{Allgemeine Benutzungshinweise}
+
+Alle Eingaben innerhalb des Monitors erfolgen in hexadezimaler Schreibweise (ohne vorangestelltes
+Dollar-zeichen!). Sollten Sie sich bei der Eingabe vertippen,
+so kann diese jederzeit mit '\texttt{X}' abgebroched werden.
+Wenn Fragen im Dialog auftreten, werden diese mit '\texttt{Y}'
+(Yes) positiv beantwortet, jeder andere Tastendruck
+(auch \key{RETURN}) beantwortet die Frage verneinend. Auch
+hier ist ein Abbruch mit '\texttt{X}' möglich.
+Filenamen müssen immer im Standard-Atari Format einge-
+geben werden, d.h. zuerst einen Gerätenamen (\texttt{D:}, \texttt{D1:},
+\texttt{D2:}\dots) dann der Filename mit max. 8 Zeichen, der nach
+einem Dezimalpunkt noch eine max. 3 Zeichen lange
+Erweiterung haben darf.
+
+\begin{tabular}{lp{25em}}
+Beispiele: & \texttt{D:TEST.OBJ}, \texttt{D2:CODE.COM}, \texttt{D1:FILE} \\
+\end{tabular}
+
+\section{Befehlsvorat des Monitors}
+
+Die Befehle des Maschinensprache-Monitors bestehen aus
+einfachen Buchstaben, die Parameter, soweit nötig,
+werden im Dialog abgefragt.
+
+\subsection{\texttt{M} - Memory-Dump}
+
+Hit dem \texttt{M}-Befehl können Sie einen Speicherbereich in
+hexaderimaler Schreibweise auf Bildschirm oder Drucker
+ausgehen, weiterhin können Sie eine zusätz\-liche Darstellung den Speicherinhaltes in \texttt{ASCII}-Zeichen
+erhalten.\\
+
+Beispiel: \\
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{10em}p{10em}}
+Ihre Eingabe	& Bildschirm \\
+\hline \texttt{M}		& \texttt{DUMP} \\
+\texttt{D000} 	& \texttt{FROM:D000} \\
+\texttt{D080}	& \texttt{TO:D080} \\
+\texttt{Y}		& \texttt{ASCII?Y} \\
+\key{RETURN}	& \texttt{PRINT?} \\
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+Nun wird der Speicherbereich von \texttt{\$D000}-\texttt{\$D080} sowohl in
+hexadezimaler Schreibeweise als auch in ASCII ausgegeben. Hätten Sie bei der Frage ASCII? einfach
+\key{RETURN} gedrückt, so würde nur die hexadezimale
+Schreibweise ausgegeben. Antworten Sie auf die Frage
+\texttt{PRINT?} mit '\texttt{Y}', dann müssen Sie sich für einen
+Ausgabekanal entscheiden:
+
+\begin{enumerate}[(\arabic{enumi})]
+\item wählt die serielle Schnittstelle R1: des
+	ATARI-Interfaces als Ausgabekanal
+\item Ausgabekanal ist die Centronics-Schnittstelle des
+	ATARI-Interfaces (normaler '\texttt{P:}'-Printer-Handler).
+\item Ausgabe über Joystickinterface Port 3 \& 4 (400/8OO)
+\end{enumerate}
+
+\subsection{\texttt{D} - Disassemble}
+
+Mit dem \texttt{D}-Befehl können Sie den Inhalt eines Speicherbereiches als \texttt{6502}-Befehle rückübersetzen
+(disassemblieren) lassen. Wie bei \texttt{M} können Sie die Ausgabe auf
+den Drucker umlenken. \\
+
+Beispiel: \\
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{10em}p{10em}}
+Ihre Eingabe	& Bildschirm \\ \hline
+\texttt{D}		& \texttt{DISASSEMBLER} \\
+\texttt{D000}	& \texttt{START?D000} \\
+\key{RETURN}	& \texttt{PRINT?} \\
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+Jetzt wird der Speicherinhalt ab der Adresse \texttt{\$D000} in
+disassemblierter Form ausgegeben, wobei immer nach
+einer Füllung des Bildschirmes unterbrochen wird.
+Durch Drücken einer beliebigen Taste (außer '\texttt{X}') wird
+der nächste Bildschirm ausgegeben. '\texttt{X}' beendet die
+Disassemblierung. Bei Ausgabe auf Drucker findet keine
+Unterbrechung des Listings statt, der Ausdruck kann
+mit \key{RESET} abgebrochen werden.
+
+\subsection{\texttt{C} - Change Memory}
+
+Das \texttt{C}-Kommando erlaubt Ihnen die Veränderung von
+Speicherinhalten. Die Eingabe erfolgt in
+hexadezimaler Schreibweise.\\
+
+Beispiel: \\
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{10em}p{10em}}
+Ihre Eingabe	& Bildschirm \\ \hline
+\texttt{C}		& \texttt{CHANGE} \\
+\texttt{A900}	& \texttt{ADDRESS?A900} \\
+\texttt{FF}		& \texttt{A900 => FF} \\
+\texttt{00}		& \texttt{A901 => 00} \\
+\texttt{X}		& \texttt{A902 =>} \\
+				& \texttt{MONITOR.}
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+Sie können gezielt einzelne Bytes oder auch zusammenhängende Speicherblöcke in hexadezimaler Form
+eingeben. Durch die Eingabe von '\texttt{X}' kommen Sie wieder in
+den Befehls-Eingabemodus des Monitors zurück.
+
+\subsection{\texttt{F} - Fill Memory}
+
+Mit dem \texttt{F}-Befehl können Sie einen Speicherbereich mit
+einem gewünschten Wert vorbesetzen.\\
+
+Beispiel: \\
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{10em}p{10em}}
+Ihre Eingabe	& Bildschirm \\ \hline
+\texttt{F}		& \texttt{FILL} \\
+\texttt{A900}	& \texttt{FROM:A900} \\
+\texttt{AFFF}	& \texttt{TO:AFFF} \\
+\texttt{FF}		& \texttt{WITH:FF} \\
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+Wirkung: Der Speicherbereich \texttt{\$A900} bis \texttt{\$AFFF} wird mit
+dem Wert \texttt{\$FF} gefüllt.
+
+\subsection{\texttt{B} - Blocktransfer}
+
+Das \texttt{B}-Kommando erlaubt die Verschiebung ganzer
+Speicherblöcke. Dies kann nützlich sein, wenn Sie bei
+der Assemblierung mit \atmas eine unterschiedliche
+logische und physikalische Adresse gewählt haben. Der
+\texttt{B}-Befehl benötigt Anfangs- und Endadresse des zu verschiebenden Bereiches, sowie die Anfangsadresse des
+Zielbereiches.\\
+
+Beispiel: \\
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{10em}p{10em}}
+Ihre Eingabe	& Bildschirm \\ \hline
+\texttt{B}		& \texttt{BLOCKTRANSFER} \\
+\texttt{A800}	& \texttt{FROM:A800} \\
+\texttt{A900}	& \texttt{TO:A900} \\
+\texttt{AC00}	& \texttt{INTO:AC00} \\
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+Wirkung: Der Speicherblock von \texttt{\$A800} bis \texttt{\$A900} wird in
+den Speicherbereich von \texttt{\$AC00} bis \texttt{\$AD00} kopiert.
+
+\subsection{\texttt{G} - Goto Address}
+
+Mit dem \texttt{G}-Befehl können Sie ein Maschinenprogramm
+starten, dessen Einsprungadresse Sie eingeben müssen.\\
+
+Beispiel: \\
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{10em}p{10em}}
+Ihre Eingabe	& Bildschirm \\ \hline
+\texttt{G}		& \texttt{GOTO} \\
+\texttt{A800}	& \texttt{GOTO A800} \\
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+ACHTUNG: Sie müssen selbst dafür Sorge tragen, daß ein
+ausführbares Maschinenprogramm an der angegebenen
+Stelle steht!
+
+Die Kontrolle wird an den Monitor zurückgegeben, wenn
+das Maschinenprogramm entweder mit einem \texttt{RTS} (Return
+from Subroutine) oder \texttt{BRK} (Break-Befehl, Hex-Byte \texttt{\$00})
+endet. Im letzteren Fall bekommen Sie die Register-inhalte und die Prozessor-Flags angezeigt, eine
+hervorragende Möglichkeit, um ein Programm nach Fehlern
+zu durchsuchen.
+
+\subsection{\texttt{S} - Binary Save}
+
+Um ein vom Assembler erzeugtes Maschinenprogramm auf
+Diskette abzuspeichern, können Sie entweder ins \texttt{DOS}
+gehen (über Editor, \key{ESC} \texttt{M} \key{ESC} \key{ESC}) oder den
+Monitor-Belehl \texttt{S} benutzen. Der Monitor speichert
+Maschinenprogramme so ab, daß Sie vom \texttt{DOS-II} (oder
+dazu kompatiblen \texttt{DOS}-Versionen) wieder geladen werden
+können.\\
+
+Beispiel: \\
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{10em}p{16em}}
+Ihre Eingabe			& Bildschirm \\ \hline
+\texttt{S}				& \texttt{SAVE} \\
+\texttt{A800}			& \texttt{FROM:A800} \\
+\texttt{AF00}			& \texttt{TO:AF00} \\
+\key{RETURN}			& \texttt{INTO:} \\
+\texttt{D:TEST.OBJ}		& \texttt{FILENAME(D:FN.EXT)? D:TEST.OBJ} \\
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+Dieses Beispiel bewirkt, daß der Speicherbereich von
+\texttt{\$A800} bis \texttt{\$AF00} als File \texttt{TEST.OBJ} im Laufwerk \texttt{1} abge-
+speichert wird. Der Filename muß immer im Standard-
+Atari Format eingeben werden.
+
+Der \texttt{SAVE}-Befehl des \atmas Monitors hat noch einige
+Zusätze aufzuweisen, die über den Standard hinaus-
+gehen:
+
+\begin{enumerate}[a)]
+\item Adressversetztes Abspeichern: Sie können ein Programm
+so abspeichern, daß es beim erneuten Einlesen in
+einen anderen Speicherbereich geladen wird. Das ist
+sehr nützlich, wenn Sie Programme mit getrennter logischer
+und physikalischer Adresse (s. \texttt{ORG}-Direktive)
+assembliert haben.
+
+Sie müssen dazu bei den Fragen \texttt{FROM} bzw. \texttt{TO} den
+physikalen Adressbereich angeben (wo das Programm momentan
+abgelegt wurde) und bei der Frage \texttt{INTO} die logische
+Adresse (an die das Programm geladen werden soll)
+angeben.\\
+
+Beispiel: \\
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{10em}p{18em}}
+Ihre Eingabe	& Bildschirm \\ \hline
+\texttt{S}				& \texttt{SAVE} \\
+\texttt{A800}			& \texttt{FROM:A800} \\
+\texttt{A780} 			& \texttt{TO:A980} \\
+\texttt{4000}			& \texttt{INTO:4000} \\
+\texttt{D:TEST.OBJ}		& \texttt{FILENAME(D:FN.EXT)?D:TEST.OBJ} \\
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+Dieses Beispiel würde ein Programm, das von \texttt{\$A800} bis
+\texttt{\$A980} im Speicher steht, so auf die Diskette schreiben,
+daß es beim erneuten Einlesen im Bereich von
+\texttt{\$4000} bis \texttt{\$4180} liegt. Hatten Sie das Programm mit
+\texttt{ORG \$4000,\$A800} assem\-bliert, so ist es jetzt ein
+lauffähiges Ma\-schi\-nen\-pro\-gramm. ACHTUNG: Sie sollten
+dieses File nicht mehr im Monitor einlesen, da sonst
+\atmas überschrieben würde!
+
+\item Append-Option: Wenn Sie als letztes Zeichen des
+Filesnames ein Größer-Zeichen ('\texttt{>}') eingeben, so wird
+das File an ein eventuell bereits bestehendes mit
+gleichem Filenamen angehängt. Sie können damit Com-
+pound-Files (aus mehreren Blöcken zusammengesetzte
+Files) oder Files mit \texttt{INIT} und \texttt{RUN}-Adresse erzeugen.\\
+
+Beispiel: \\
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{10em}p{18em}}
+Ihre Eingabe	& Bidschirm \\ \hline
+\texttt{S}				& \texttt{SAVE} \\
+\texttt{AA00}			& \texttt{FROM:AA00} \\
+\texttt{AB00}			& \texttt{TO:AB00} \\
+\key{RETURN} 			& \texttt{INTO:} \\
+\texttt{D:TEST-OBJ>}	& \texttt{FILENAME (D:FN.EXT)?D:TEST.OBJ>} \\
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+Das File \texttt{TEST.OBJ} (von vorhin) wird in diesem Beispiel
+um den Speicherblock von \texttt{\$AA00} bis \texttt{\$AB00} verlängert.
+Mit derselben Methode können Sie auch \texttt{RUN} und \texttt{INIT}-Adressen
+an ein File anfügen: Sie tragen die \texttt{RUN}-Adresse
+(\texttt{LSB}, \texttt{MSB}) in die Adressen \texttt{\$02E0}, \texttt{\$02E1} (\texttt{INIT}:
+\texttt{\$02E2}, \texttt{\$02E3}) ein und hängen den jeweiligen 'Speicher-block'
+(der nur aus zwei Bytes besteht \texttt{FROM: 02E0 TO: 02E1}) an das File an.
+\end{enumerate}
+
+\subsection{\texttt{L} - Binary Load}
+
+Analog zum Save-Befehl kann hier ein Binär-File von
+der Diskette geladen werden. Es kann sich dabei um ein
+vom Save-Befehl erzeugtes oder um ein \texttt{DOS} erzeugtes
+Binär-File handeln, auch zusammengesetzte Compound-Files
+werden geladen. \texttt{RUN} und \texttt{INIT} Sprünge werden
+nicht ausgeführt.\\
+
+Beispiel: \\
+
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{10em}p{10em}}
+Ihre Eingabe	& Bildschirm \\ \hline
+\texttt{L}				& \texttt{LOAD} \\
+\texttt{D:TEST.OBJ}		& \texttt{FILENAME(D:FN.EXT)? D:TEST.OBJ} \\
+						& \texttt{FROM: 5000 TO: 5190} \\
+						& \texttt{FROM: AA00 TO: AB00} \\
+\end{tabular}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+Der Load-Befehl gibt Ihnen gleich an, in welchen
+Speicherbereich das Binär-File geladen wurde. Im
+Beispiel wurde ein File geladen, welches ähnlich
+zu dem im Save-Beispiel erzeugten ist.
+
+\subsection{\texttt{E} - Editor}
+
+Mit dem \texttt{E}-Kommando gelangen Sie zurück in den Editor,
+der Cursor befindet sich noch an der Stelle, wo Sie
+den Editor Verlassen haben.
+
+\subsection{\texttt{I} - Disketteninhaltsverzeichnis}
+
+Der \texttt{I}-Befehl zeigt Ihnen alle Filenamen des Laufwerks
+\texttt{1} auf dem Bildschirm an.
+
+\chapter{Examples}
+
+\section{Demo program, color scrolling}
+
+The following example should clarify the interaction of the individual components of \atmas.
+It would be advantageous if chapter 1 (The editor) of this manual has been read and you are slightly familiar with the editor.
+Chapter 2 and 3 would not necessarily be required, but they will certainly contribute to better understanding. 
+
+Although the following demo program is included on the \atmas disk (\texttt{DEMO.SRC})
+you should still type it in manually in order to better familiarize yourself with the editor.
+When problems occur, you can use the included file as a fallback.
+
+\begin{Verbatim}
+*************************************
+* ATMAS-II Demo: Color Scrolling PF85
+*
+* Stop by pressing START
+*************************************
+
+COLPF2  EQU $D018      Color register
+HSYNC   EQU $D40A      Horizontal sync
+VCOUNI  EQU $D40B      Rasterline
+RTCLK   EQU $14        VBI Clock
+CUNSDL  EQU $D01F      function keys
+
+*
+* Program in USER-space
+* (at $A8OO)
+*
+
+	ORG $A800
+
+	LDA #8         Prepare polling the
+	STA CONSOLD    START-key
+SCRCOL  CLC
+	LDA VCOUNT     Screen counter
+	ADC RTCLK      plus raster line
+	STA HSYNC      synchronise
+	STA COLPF2     to color register
+	LDA CONSOL     function keys
+	AND #1         START-key?
+	BNE SCRCOL     no, continue-->
+	RTS
+\end{Verbatim}
+%$
+
+As a reminder, here are some tips on typing in the program:
+comment lines start with a star in the first column.
+Also have lines that are provided with a label starting at the first column.
+For all other lines, it is advantageous to use a tab at the beginning of the line. \\
+
+Example: \\
+
+The first '\texttt{EQU}' line should be typed like this: \\
+
+	\texttt{COLPF2}\key{TAB}\texttt{EQU} \texttt{\$D01B}\key{RETURN} \\
+
+
+After you have typed-in the whole program, you can begin assembling  by pressing \key{CTRL-Y}.
+You see the copyright of the assembler and if the assembler has detected no error, it will display
+the end address of the generated object code.
+
+If errors occurred, these are presented to you in plain text on the screen.
+You can change them using the error table in Appendix B to track the down.
+We only discuss typo's here.
+
+First, you press any key to return to the editor. The cursor is now at the offending line.
+A small tip: Sometimes it helps by pressing \key {CTRL-T} to see if perhaps a tab sits at
+the wrong location (i.e. a line that has only one tab
+or has only spaces will be reported as a \texttt {SYNTAX ERROR}).
+
+If the assembler does not report an error, you can go out to start the program you just assembled.
+To do this, you press any key to get back to the editor and then type \key{CTRL-P} to call to the monitor.
+
+In the monitor you can view the program generated by the assembler.
+To do this, type '\texttt {D}' (Disassemble) followed by '\ texttt {A800}' and \key{RETURN}.
+You should now see a disassembled listing of the program on the screen.
+Now press '\texttt {X}' to cancel the disassembler's listing.
+
+To start the program type '\texttt{G}' (\texttt{GOTO})
+and the start address of the program, in our case '\texttt {A800}'.
+If you did everything correctly, you should now see 128 colors running on the screen.
+The color spectacle can be terminated by pressing \key{START} or \key{RESET}.
+When you press \key {RESET}, you will automatically return to the editor. By pressing \key{START},
+the program is properly terminated and control goes back to the monitor.
+'\texttt {E}' finally reactivates the editor.
+
+\section{Macro libraries}
+
+On the \atmas disk, you can find two files -- \texttt{IOLIB.SRC} and \texttt{GRAFLIB.SRC} --
+whose source code is included on the following pages.
+Both are so-called macro libraries, which means that, except for a small
+demo program, they only include macro definitions. Both contain inline comments,
+so an in-depth description is not necessary.
+
+\texttt{GRAFLIB.SRC} contains macros that behave similarly to their \texttt{BASIC} counterparts
+(\texttt{GRAPHICS}, \texttt{COLOR}, \texttt{PLOT} and \texttt{DRAWTO}).
+You can view the demo by loading and assembling \texttt{GRAFLIB.SRC} and by using the
+monitor to '\texttt{G}'o to address \texttt{\$A800}.
+
+\texttt{IOLIB.SRC} contains macros similar to the \texttt{OPEN}, \texttt{CLOSE}, \texttt{PRINT} and \texttt{INPUT}
+\texttt{BASIC} commands and two additional macros (\texttt{BGET} and \texttt{BPUT}) for loading
+and saving binary data. This library also contains an interesting demo, which can be run similarly
+as that of \texttt{GRAFLIB}.
+
+The macro libraries contain examples of nesting macros and passing string parameters.
+Both files can be seen as examples of what can be done with \atmas.
+
+Obviously, it is allowed to extend and improve both libraries as you wish.
+
+\begin{Verbatim}
+************************************
+* 	GRAFLIB.SRC
+*
+* 	Macro Library
+*
+* 	GRAPHICS
+*
+*	For ATMAS-II
+*			PETER FINZEL
+************************************
+*
+* IOCB Structure
+*
+ICCOM	EQU $342
+ICSTA	EQU $343
+ICBAL	EQU $344
+ICBAH	EQU $345
+ICBLL	EQU $348
+ICBLH	EQU $349
+ICAX1	EQU $34A
+ICAX2	EQU $34B
+
+CIOV	EQU $E456
+
+* CIO Commands
+
+COPEN	EQU 3
+CCLSE	EQU 12
+CGTXT	EQU 5
+CPTXT	EQU 9
+CGBIN	EQU 7
+CPBIN	EQU 11
+CDRAW	EQU $11
+
+* ATARI Graphics Variables
+
+ATACHR	EBU $2FB
+ROWCRS	EBU $54		CURSOR-
+COLCRS	EBU $55		POSITION
+
+*
+* GRAPHICS-Command
+*
+* Call: GRAPHICS <mode>
+*
+* <mode>  0 bis 15 (XLs)
+*         0 bis 11 (400/800)
+*
+GRAPHICS MACRO MODE
+	JMP GR1@
+
+DEV@    ASC 'S:'
+
+GR1@    LDX #$60
+	LDA #CCLSE	 FIRST CLOSE CHANNEL 6
+	STA ICCOM,X
+	JSR CIOV
+	LDA #MODE	 SET NEW MODE
+	STA ICAX2,X
+	AND #$F0
+	EOR #$10
+	ORA #$0C
+	STA ICAX1,X
+	LDA #COPEN
+	STA ICCOM,X
+	LDA #DEV@
+	STA ICBAL,X
+	LDA #DEV@/256
+	STA ICBAH,X
+	JSR CIOV
+	MEND
+*
+* Select drawing color
+*
+* Call: COLOR <color>
+*
+* <color> ranges from 0-255,
+* 	  depending on graphics mode.
+* 	  Must be constant
+*
+
+COLOR   MACRO COL
+	LDA #COL
+	STA ATACHR
+	MEND
+
+*
+* Move cursor to position
+*
+* Call: POSITION <x>,<y>
+*
+* <x>,<y> depends on graphics mode
+* 	  both must be constant
+*
+*
+POSITION MACRO X,Y
+	LDA #X
+	STA COLCRS
+	LDA #X/256
+	STA COLCRS+l
+	LDA #Y
+	STA ROWCRS
+	MEND
+
+* Draw point
+*
+* Call: PLOT <x>,<y>
+*
+* <x>,<y> depends on graphics mode
+* 	  must be constant
+*
+PLOT    MACRO X,Y
+	POSITION X,Y
+	LDX #$60	CHANNEL 6
+	LDA #CPBIN
+	STA ICCOH,X
+	LDA #O
+	STA ICBLL,X
+	STA ICBLH,X
+	LDA ATACHR
+	JSR CIOV
+	MEND
+*
+* Draw line
+*
+* Call: DRAWTO <x>,<y>
+*
+* <x>,<y>  depends on graphics mode
+*			must be constant
+DRAWTO  MACRO X,Y
+	POSTTION X,Y
+	LDX #$60	CHANNEL 6
+	LDA #CDRAH
+	STA ICCOM,X
+	LDA #CCLSE
+	STA ICAXl,X
+	LDA #O
+	STA ICAX2,I
+	JSR CIOV
+	MEND
+
+*************************************
+* Demo-Program for Graphics Library
+*
+* draw diamond shape in GRAPHICS 7
+*************************************
+
+*
+* assemble to memory reserved
+* for object-code
+*
+	ORG $A800
+
+	GRAPHICS 7+16
+	COLOR 1
+	PLOT 79,0
+	DRAWTO 159,47
+	DRAWTO 79,95
+	DRAWTO 0,47
+	DRAWTO 79,0
+
+ENDLESS JMP ENDLESS
+*
+* Stop by pressing <RESET>
+*
+
+***********************************
+* 	IOLIB.SRC
+*
+* 	MACRO LIBRARY
+*
+* 	Input/Output
+*
+* 	for ATMAS-II
+*
+*		by PETER FINZEL
+***********************************
+
+* IOCB Constants
+
+CIOV    EQU $E456
+
+ICCOM   EQU $342
+ICSTA   EQU $343
+ICBAL   EQU $344
+ICBAH   EQU $345
+ICBLL   EQU $348
+ICBLH   EQU $349
+ICAX1   EQU $34A
+lCAX2   EQU $34B
+
+* CIO Commands
+
+COPEN   EQU 3
+CCLSE   EQU 12
+CGTXT   EQU 5
+CPTXT   EQU 9
+CBBIN   EQU 7
+CPBIN   EQU 11
+
+EOL     EQU $9B
+
+*
+* MACRO FOR CALCULATING THE CHANNEL NUMBER
+* (only for internal use, is
+*  an example of nested
+*  macro calls)
+*
+CHANNUM MACRO CHANNEL
+	LDA #CHANNEL	IOCB-Offset
+	ASL 		*output channel number
+	ASL 		*(times 16)
+	ASL
+	ASL
+	TAX 		* Result in X-Register
+	MEND
+
+*
+* Name     : OPEN
+* Goal     : Open file
+* Call     : OPEN <Num>,<Aux1>,<Aux2>,<Filename>
+* Example  : OPEN 1,4,0,"D:TEST.DBJ"
+*
+OPEN    MACRO CHANNEL,AUX1,AUX2,FILENAME
+	JMP OP1@
+FNAME   ASC FILENAME
+	DFB EOL
+0P1@    CHANNUM CHANNEL
+	LDA #AUXI
+	STA ICAX1,X
+	LDA #AUX2
+	STA ICAX2,X
+	LOA #COPEN
+	STA ICCOM,X
+	LDA #FNAME
+	STA ICBAL,X
+	LDA #FNAME/256
+	STA ICBAH,X
+	JSR CIOV
+	MEND
+*
+* Name     : CLOSE
+* Goal     : Close file
+* Call     : CLOSE <Num>
+* Example  : CLOSE 1
+*
+CLOSE   MACRO CHANNEL
+	CHANNUM CHANNEL
+	LDA #CCLSE
+	STA ICCOM,X
+	JSR CIOV
+	MEND
+
+*
+* Name     : PRINT
+* Goal     : Print a string defined with 'ASC',
+*            must end with EOL
+* Call     : PRINT <Channel>,<Label>
+* Example  : PRINT 0,TEXT1
+*
+PRINT   MACRO CHANNEL,LABEL
+	CHANNUM CHANNEL
+	LDA #CPTXT
+	SIA ICCOM,X
+	LDA #LABEL
+	STA ICBAL,X
+	LDA #LABEL/256
+	STA ICBAH,X
+	LDA #127	maximum length
+	STA ICBLL,X
+	LDA #0
+	STA ICBLH,X
+	JSR CIOV
+	MEND
+
+*
+* Name     : PRINTS
+* Goal     : print string directly
+*            to screen
+* Call     : PRINT <String>
+* Example  : PRINTS "HALLO"
+*
+PRINTS  MACRO STRING
+	JMP PR2@
+PRI1@   ASC STRING
+	DFB EOL
+PR2@    PRINT 0,PRI1 	macro above!
+	MEND
+*
+* Name     : INPUT
+* Goal     : Read string
+* Call     : INPUT <Channel>,<Label>
+* Example  : INPUT 0,TEXT1
+*
+INPUT   MACRO CHANNEL,LABEL
+	CHANNUM CHANNEL
+	LDA #CGTXT
+	STA ICCOM,X
+	LDA #LABEL
+	STA ICBAL,X
+	LDA #LABEL/256
+	STA ICBAN,X
+	LDA #127	maximum length
+	STA ICBLL,X
+	LDA #0
+	STA ICBLH,X
+	JSR CIOV
+	MEND
+*
+* Name     : BGET
+* Goal     : Read data block
+*            of length L at address A
+* Call     : BGET <Num>,<L>,<A>
+* Example  : BGET 1,$B000,$100
+*
+BGET    MACRO CHANNEL,LENGTH,BUFFER
+	CHANNUM CHANNEL
+	LDA #CGBIN
+	STA ICCOM,X
+	LDA #LENGTH
+	STA ICBLL,X
+	LDA #LENGTH/256
+	STA ICBLN,X
+	LDA #BUFFER
+	STA ICBAL,X
+	LDA #BUFFER/256
+	STA ICBAN,X
+	JSR CIOV
+	MEND
+
+* Name    : BPUT
+* Goal    : Save data block
+*           of length L at address A
+* Call    : BPUT <Num>,<L>,<A>
+* Example : BPUT 1,$B000,$100
+*
+BPUT    MACRO CHANNEL,LENGTH,BUFFER
+	CHANNUM CHANNEL
+	LDA #CPBIN
+	STA ICCOM,X
+	LDA #LENGTH
+	STA ICBLL,X
+	LDA #LENGTH/256
+	STA ICBLH,X
+	LDA #BUFFER
+	STA ICBAL,X
+	LDA #BUFFER/255
+	STA ICBAH,X
+	JSR CIOV
+	MEND
+
+**********************************
+* Demo Program I/O-Library
+* display directory of drive 1.
+**********************************
+
+	ORB $A800
+	PRINTS "Directory Drive 1:"
+	OPEN 1,6,0,"D1:*.*"
+
+NEXT    INPUT 1,BUFFER		Read directory line
+	BMI END 		      End of File?
+	PRINT 0,BUFFER		and print
+	JMP NEXT		      next line
+
+END     CLOSE 1		       Done!
+	RTS
+
+BUFFER  ORG *+20		      Reserve space
+
+* START THE DEMO:
+* Assemble with <CTRL>-Y,
+* activate the monitor with <CTRL>-P 
+* and start with 'G'oto A800.
+\end{Verbatim}
+%$
+
+\appendix
+
+\chapter{\atmas Memory Map}
+
+\begin{Verbatim}
+0000 - 007F:	Used by Operating System
+0080 - 0085:	*** free for personal use ***
+0086 - 00DF:	Used by ATMAS-II Editor and Monitor
+00E0 - 00FD:	Used by ATMAS-II Assembler, but is free
+		    to use after the assembler has finished
+00FE - 047F:	Hardware stack, O.S. Vectors, IOCB's etc...
+0480 - 05FF:	*** free for personal use ***
+0600 - 06FF:	*** free for personal use (Page 6) ***
+0700 - <LOMEM>:     DOS, <LOMEM> DOSII:=$1F00
+		    DOSXL:=$2700
+<LO> - 27FF:        *** free for personal use ***
+2800 - 4AFF:        ATMAS-II
+4800 - 4BFF:        Line buffer
+4C00 - 5FFF:        Symbol table
+6000 - 63FF:        Copy-register
+6400 - A7FF:        Text buffer (source code)
+A800 - <MEMTOP>:    *** free for personal use ***
+<ME> - BFFF:	Display list and screen memory
+\end{Verbatim}
+
+There are several ranges of free memory you can use for your object code:
+
+\begin{enumerate}[A)]
+\item \texttt{\$600}-\texttt{\$6FF}: the infamous Page 6, especially used for
+	writing small routines to be called by \texttt{USR()} from \texttt{BASIC}.
+
+\item \texttt{\$1F00}-\texttt{\$27FF}: this range starts at the end of \texttt{DOS}, which
+	can be determined by reading \texttt{\$2E7-\$2E8}, up to the start address of \atmas itself.
+	The end of \texttt{DOS} can vary for different \texttt{DOS} versions, so you have to be careful here.
+	For standard \texttt{DOS-II}, this range starts at \texttt{\$1F00}.
+
+\item \texttt{\$A800}-\texttt{\$BC3F}: The standard range for object code,
+	reaches up to the display list and screen memory.
+\end{enumerate}
+
+The memory used by the symbol table (\texttt{\$4C00}-\texttt{\$5FFF}) can be
+used for variables, font definitions or Player-Missile Graphics, as the symbol table will not be
+used after the assembler has run and will be rebuilt the next time the assembler is run.
+
+\chapter{Error codes}
+
+\section{Assembler errors}
+
+\begin{longtable}{p{11em}p{20em}}
+\texttt{SYNTAX ERROR} &	e.g. a line-number is specified or a line consists only of whitespace (tabs and spaces) \\
+
+\texttt{NAME UNKNOWN} & 	Invalid opcode, e.g. \texttt{SRA} instead of \texttt{STA} \\
+
+\texttt{UNDEFINED EXPRESSION} & Invalid operand, e.g. invalid expression or undefined label. \\
+
+\texttt{ADDRESSING ERROR} & Addressing mode mismatch, i.e. \texttt{STA \#\$6FF} \\
+
+\texttt{IMPOSSIBLE BRANCH} & Branches (\texttt{BNE}, \texttt{BCS}\dots)
+		can only reach addressess between \texttt{*-128} and \texttt{*+127}. Use \texttt{JMP} instead. \\
+
+\texttt{DIVISION BY ZERO} & e.g. \texttt{LDA \#100/0} \\
+
+\texttt{NUMBER-ERROR} &	Invalid number, e.g. \texttt{LDA \#\%30} or \texttt{LDA \#A0} \\
+
+\texttt{WRONG DELIMITER} & Invalid delimiter used for \texttt{ASC} command. \\
+
+\texttt{NO ASCII} & 	Invalid ASCII character constant, e.g. \texttt{LDA \#'}\key{RETURN} \\
+
+\texttt{LINE TO LONG} & 	Maximum line length is 127 characters \\
+
+\texttt{MACRO ERROR} &	Invalid macro definition or macro call (invalid parameters) \\
+
+\texttt{ORG ERROR} &	Invalid \texttt{ORG}-directive \\
+
+\texttt{TOO MANY LABELS} & Symbol table is full \\
+
+\texttt{OPCODE DIFFERENT} & Pass 3 does not match pass 2. This can happen if pass 2 overwrites the text buffer because of an invalid \texttt{ORG}. \\
+\end{longtable}
+\bigskip
+
+\section{Editor errors}
+
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{lp{25em}}
+\texttt{RW} & Error during disk I/O \\
+\texttt{CO} & Command line too long \\
+\texttt{E?} & Error, invalid command line \\
+\texttt{H?} & Invalid hexadecimal value \\
+\texttt{I?} & Textbuffer is full (\texttt{T:00000}) \\
+\texttt{L?} & Device error during output of listing \\
+\texttt{S?} & String not found (search-function) \\
+\texttt{T?} & Invalid tab-width (must be \texttt{1}-\texttt{9}) \\
+\texttt{C?} & Copy-register is full (\texttt{C:0OOO}) \\
+\texttt{\#?} & Invalid repeat-factor (must be \texttt{2}-\texttt{255}), \\
+ & \\
+\texttt{OK} & Situation Normal, All\dots is well. Copy-register is closed \\
+\texttt{CR} & Copy-register is open \\
+\end{longtable}
+\renewcommand{\arraystretch}{1.8}
+\bigskip
+
+\section{Monitor error codes}
+
+\begin{longtable}{p{5em}p{25em}}
+\texttt{ADR ERROR} & Wrong address during loading or saving of a program.
+	If this occurs during a \texttt{LOAD}-command, it's probably not a binary file, but, for example, a text file.\\
+
+\texttt{ERRORCODE} & \texttt{80}-\texttt{FF}: Operating System Error, see the \texttt{DOS}-Manual.
+		Error codes are hexadecimal. \\
+\end{longtable}
+
+\chapter{\atmas REFERENCE CARD}
+
+\pagestyle{empty}
+\begin{landscape}
+\vspace*{-6\baselineskip}
+
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lp{23em}|lp{22em}}
+ 								& \textsc{\textbf{Editor commands in textmode}} 	&				 & \textsc{\textbf{Assembler directives}} \\
+\key{CTRL-E} 					& Cursor to start of text							& \texttt{ORG}	 & Specify start address \\
+\key{CTRL-D} 					& Cursor to end of text 							& \texttt{EQU}	 & Define constant \\
+\key{CTRL-R} 					& Open copy-register	 							& \texttt{EPZ}	 & Define zero-page constant (not obligatory)\\
+\key{CTRL-F} 					& Close copy-register		 						& \texttt{DFB}	 & Insert byte into object code \\
+\key{CTRL-J} 					& Insert copy-register								& \texttt{DFW}	 & Insert word into object code \\
+\key{CTRL-K} 					& Clear copy-register								& \texttt{ASC}	 & Insert \texttt{ASCII} or screencodes into object code \\
+\key{CTRL-V} 					& Switch between 1- and 2-line mode		 			& \texttt{OUT}	 & Control listing format \\
+\key{CTRL-T} 					& Toggle control-character display		 			& \texttt{MACRO} & Start macro-definition \\
+\key{CTRL-G} 					& Repeat command line			 					& \texttt{MEND}	 & End macro-definition \\
+\key{CTRL-Y} 					& Call \atmas macroassembler		 				&				 & \textsc{\textbf{Monitor Commands}} \\
+\key{CTRL-P} 					& Call Monitor						 				& \key{M}	 	 & Memory dump \\
+								& \textsc{\textbf{Editor commands at the command line}} & \key{D}	 & Disassemble memory range \\
+\texttt{B} 	 					& Cursor one position backwards	 						& \key{C}	 & Change memory range \\
+\texttt{F} 	 					& Cursor one position forwards						& \key{F}	 	 & Fill memory range with constant value \\
+\texttt{D} 	 					& Delete character left from cursor 					& \key{B}	 & Block transfer (copy) \\
+\texttt{T} 	 					& Delete untill end-of-line					 		& \key{G}	 & Goto, i.e. jump to specified address \\
+\texttt{H}\foo{Hexbyte} 		& Insert specified \texttt{ASCII}-Code				& \key{S}	 & Binary Save \\
+\texttt{S}\foo{String} 			& Search for \foo{String}			 				& \key{L}	 & Binary Load \\
+\texttt{I}\foo{String} 			& Insert \foo{String}						 		& \key{E}	 & Return to editor \\
+\texttt{J} 	 					& Repeat command		 							& \key{I}	 & Inventory, list directory contents of \texttt{D1:} \\
+\texttt{K} 	 					& Clear textbuffer	 \\
+\texttt{U} 	 					& User command, start code at \texttt{\$A800} \\
+\texttt{@}\foo{n} 	 			& Set tabwidth to \foo{n} characters \\
+\texttt{M} 	 					& Return to \texttt{DOS} \\
+\texttt{E} 	 					& Clear copy-register 							& & \atmas Reference Card \\
+\texttt{G}	 					& Insert copy-register \\
+\texttt{W}\foo{D\!\!:\!\!FN}	& Save text as \foo{D\!\!:\!\!FN} \\
+\texttt{R}\foo{D\!\!:\!\!FN}	& Read text from \foo{D\!\!:\!\!FN} (insert at cursor position) \\
+\texttt{L}\foo{0|1|2} 			& List text to device (1:=Drucker) \\
+\end{tabular}
+
+\end{landscape}
+
+\end{document}
